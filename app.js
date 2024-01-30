@@ -1,24 +1,12 @@
 const express = require('express');
 const session = require('express-session');
-const bodyParser = require('body-parser');
-const crypto = require('crypto');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const hashedSecret = require('./crypto/config');
+const route = require('./routes/users');
+
+
 
 const app = express();
 const PORT = 3000;
-
-
-const secret = crypto.randomBytes(64).toString('hex');
-const hashedSecret = bcrypt.hashSync(secret, 10);
-
-
-const users = [
-  { id: 1, username: 'usuario1', password: bcrypt.hashSync('contraseña1', 10), name: 'Usuario Uno' },
-  { id: 2, username: 'usuario2', password: bcrypt.hashSync('contraseña2', 10), name: 'Usuario Dos' },
-  { id: 3, username: 'usuario3', password: bcrypt.hashSync('contraseña3', 10), name: 'Usuario Tres' },
-];
-
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -27,8 +15,12 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   cookie: {secure: false}
-}));
+  })
+);
 
+app.use('/',route)
+
+/*
 app.use('/', (req, res, next) => {
   const userToken = req.session.token;
   if (userToken) {
@@ -107,7 +99,7 @@ app.get('/dashboard', verifyToken, (req, res) => {
 app.post('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
-});
+});*/
 
 app.listen(PORT, () => {
   console.log(`El servidor está escuchando en http://localhost:${PORT}`);
